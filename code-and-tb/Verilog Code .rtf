@@ -1,0 +1,253 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //Verilog 320 Project \
+\
+// modulo-13 up counter (counts from 0 to 12)\
+\
+module mod13counter (input clk, reset, output reg [3:0] Q);\
+  \
+  always @ (posedge clk, posedge reset) begin\
+    \
+    if (reset == 1'b1 || Q == 4'b1100)\
+      Q <= 4'b0000;\
+    else\
+      Q <= Q + 1;\
+    \
+  end\
+  \
+endmodule\
+\
+\
+//modulo-8 up counter (counts from 0 to 7)\
+\
+module mod8counter (input clk, reset, output reg [2:0] Q);\
+  \
+  always @ (posedge clk, posedge reset) begin\
+    \
+    if (reset == 1'b1 || Q == 3'b111)\
+      Q <= 3'b000;\
+    else\
+      Q <= Q + 1;\
+    \
+  end\
+  \
+endmodule\
+\
+\
+//modulo-2 up counter (counts from 0 to 1)\
+\
+module mod2counter (input clk, reset, output reg Q);\
+  \
+  always @ (posedge clk, posedge reset) begin\
+    \
+    if (reset == 1'b1 || Q == 1'b1)\
+      Q <= 1'b0;\
+    else\
+      Q <= Q + 1;\
+    \
+  end \
+  \
+endmodule\
+\
+\
+// finite-state-machine corresponding to the program\
+\
+module FSM (input clk, reset, SB, output reg TR, TY, TG, PR, PG);\
+  \
+  wire [3:0] Q12;\
+  wire [2:0] Q6;\
+  wire Q2;\
+  \
+  mod13counter C12 (clk, reset, Q12);\
+  mod8counter C6 (clk, reset, Q6);\
+  mod2counter C2 (clk, reset, Q2);\
+  \
+  reg [10:0]currentState, nextState;\
+  \
+  parameter stateA = 11'b00000000001, stateB = 11'b00000000010, stateC = 11'b00000000100, stateD = 11'b00000001000, stateE = 11'b00000010000, stateF = 11'b00000100000, stateG = 11'b00001000000, stateH = 11'b00010000000, stateI = 11'b00100000000, stateJ = 11'b01000000000, stateK = 11'b10000000000;\
+  \
+  always @ (posedge clk, posedge reset) begin\
+    \
+    if (reset == 1'b1)\
+      currentState <= stateA;\
+    else\
+      currentState <= nextState;\
+    \
+  end\
+  \
+  \
+  always @ (currentState, SB, Q12, Q6, Q2) begin\
+    \
+    case (currentState)\
+      \
+      stateA :\
+        if (SB == 1'b1 && Q12 == 4'b1100)\
+          nextState <= stateB;\
+         else \
+          nextState <= stateA;\
+      \
+      stateB :\
+        if (Q2 == 1'b0)\
+          nextState <= stateC;\
+        else \
+          nextState <= stateB;\
+          \
+      stateC :\
+        if (Q2 == 1'b0)\
+          nextState <= stateD;\
+        else\
+          nextState <= stateC;\
+      \
+      stateD :\
+        if (Q6 == 3'b110)\
+          nextState <= stateE;\
+        else\
+          nextState <= stateD;\
+      \
+      stateE : nextState <= stateF;\
+      stateF : nextState <= stateG;\
+      stateG : nextState <= stateH;\
+      stateH : nextState <= stateI;\
+      stateI : nextState <= stateJ;\
+      stateJ : nextState <= stateK;\
+      \
+      stateK :\
+        if (Q2 == 1'b0)\
+          nextState <= stateA;\
+        else\
+          nextState <= stateK;\
+      \
+    endcase\
+    \
+  end \
+  \
+  \
+  always @ (currentState) begin\
+    \
+    case(currentState)\
+      \
+      stateA :\
+        begin\
+          TG = 1;\
+          TY = 0;\
+          TR = 0;\
+          PG = 0;\
+          PR = 1;\
+        end\
+      \
+      stateB :\
+        begin\
+          TG = 0;\
+          TY = 1;\
+          TR = 0;\
+          PG = 0;\
+          PR = 1;\
+        end\
+      \
+      stateC :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 0;\
+          PR = 1;\
+        end\
+      \
+      stateD :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 1;\
+          PR = 0;\
+        end\
+      \
+      stateE :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 0;\
+          PR = 0;\
+        end\
+      \
+      stateF :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 1;\
+          PR = 0;\
+        end\
+      \
+      stateG :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 0;\
+          PR = 0;\
+        end\
+      \
+      stateH :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 1;\
+          PR = 0;\
+        end\
+      \
+      stateI :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 0;\
+          PR = 0;\
+        end\
+      \
+      stateJ :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 1;\
+          PR = 0;\
+        end\
+      \
+      stateK :\
+        begin\
+          TG = 0;\
+          TY = 0;\
+          TR = 1;\
+          PG = 0;\
+          PR = 1;\
+        end\
+      \
+    endcase\
+    \
+  end\
+  \
+endmodule\
+\
+\
+//highest level controller hierarchy\
+\
+module controller (input clk, reset, NB, SB, output TR, TY, TG, PR, PG);\
+  \
+  wire NBSB;\
+  \
+  assign NBSB = NB | SB;\
+  \
+  FSM myFSM (clk, reset, NBSB, TR, TY, TG, PR, PG);\
+  \
+endmodule\
+\
+// Link : https://edaplayground.com/x/gd7X\
+        }

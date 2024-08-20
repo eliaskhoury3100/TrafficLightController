@@ -1,0 +1,39 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 module controller_TB();\
+  \
+  reg clk_tb, reset_tb, NB_tb, SB_tb; \
+  wire TR_tb, TY_tb, TG_tb, PR_tb, PG_tb;\
+  integer i;\
+  \
+  \
+  controller UTT (clk_tb, reset_tb, NB_tb, SB_tb, TR_tb, TY_tb, TG_tb, PR_tb, PG_tb);\
+  \
+  initial begin\
+    $dumpfile("dump.vcd");\
+    $dumpvars(1);\
+    $monitor($time, "clk=%d, TR=%d, TY=%d, TG=%d, PR=%d, PG=%d", clk_tb, TR_tb, TY_tb, TG_tb, PR_tb, PG_tb);\
+    \
+    NB_tb = 1'b0;\
+    SB_tb = 1'b0;\
+    clk_tb = 1'b0;\
+    reset_tb = 1'b1;\
+    \
+    #10 reset_tb = 1'b0;\
+    NB_tb = 1'b1;\
+    SB_tb = 1'b1;\
+    \
+    for (i=0; i<75; i = i+1)\
+      #1 clk_tb = ~clk_tb;\
+      NB_tb = ~NB_tb;\
+      SB_tb = ~SB_tb;\
+  end\
+  \
+endmodule\
+\
+// Link : https://edaplayground.com/x/gd7X}
